@@ -29,7 +29,7 @@
 
         <p class="tagline">
           We study how high-value data selection, physics-aware reinforcement learning, and test-time
-          regeneration improve language-model generation of buildable LEGO brick assemblies.
+          regeneration improve language-model generation of text-geometric aligned LEGO brick assemblies.
         </p>
 
         <figure class="hero-figure">
@@ -63,13 +63,10 @@
         <p>
           Large language models can generate executable LEGO assembly programs from text, but their
           performance is strongly affected by noisy supervision and shortcut-prone training data. We
-          identify a PhysHack phenomenon: models may achieve high physical validity while failing to
-          preserve object-level semantics. To address this, we propose a sample-efficient post-training
+          identify a PhysHack phenomenon: <b>models may achieve high physical validity while failing to
+          preserve object-level semantics.</b> To address this, we propose a sample-efficient post-training
           framework that combines value-guided data selection with Physics--Voxel Policy Optimization
-          (PVPO).
-        </p>
-        <p>
-          We first select only 5% high-value demonstrations using VLM semantic scores and diversity, then
+          (PVPO). We first select only 5% high-value demonstrations using VLM semantic scores and diversity, then
           optimize models with a coupled reward combining physical validity and voxel-space geometric
           alignment. Experiments show that our method improves semantic alignment, geometry fidelity, and
           stability while using substantially less data than full-scale training.
@@ -79,31 +76,21 @@
       <section id="physhack" class="section">
         <h2>Problem: PhysHack</h2>
         <p>
-          LEGO Brick Assembly is a program synthesis task where a policy generates brick commands that
-          must both obey physical constraints and match the object described by the prompt. PhysHack is a
-          failure mode where a model learns to satisfy checkable assembly constraints while drifting away
-          from the intended object semantics and 3D structure.
+          LEGO Brick Assembly asks models to generate building steps that are both physically stable and match the prompt. PhysHack is when the model only follows the rules of assembly, but ignores the intended shape or meaning.
+
         </p>
         <blockquote>
           A model can be physically valid without being semantically correct.
         </blockquote>
         <p>
-          This makes physical validity a hackable proxy: full-scale noisy data can produce structures that
-          are stable or syntactically valid, but generic, overlong, or semantically misaligned. The paper
-          addresses this by combining better data selection with a reward that explicitly couples physics
-          and geometry.
+          Focusing only on physical validity can lead to generic or misaligned results. This work combines careful data selection and a reward that considers both physics and geometry to improve outcomes.
+
         </p>
       </section>
 
       <section id="method" class="section">
         <h2>Methods</h2>
         <h3>Value-Guided Data Selection</h3>
-        <p>
-          Rather than treating all trajectories as equally useful, we estimate the value of a training
-          example by measuring rendered text-structure semantic alignment and filtering physically invalid
-          demonstrations. We then add diversity filtering to keep a compact but broad 5% subset for
-          post-training.
-        </p>
         <p>
           This selection strategy is data-efficient: High-Value VLM + Diversity uses only 5% of the data
           but improves semantic alignment over noisy full-data supervision. Table 1 is shown in full below.
@@ -165,10 +152,10 @@
           structural fidelity. The ablation below visualizes how the voxel weight changes semantic
           alignment, physical validity, voxel alignment, and generated-brick count.
         </p>
-        <figure class="paper-figure">
-          <a class="figure-link" href="assets/combined_voxel_stability.png" target="_blank" rel="noreferrer">
+        <figure class="paper-figure pvpo-figure">
+          <a class="figure-link" href="assets/combined_voxel_stability_vertical.png" target="_blank" rel="noreferrer">
             <img
-              src="assets/combined_voxel_stability.png"
+              src="assets/combined_voxel_stability_vertical.png"
               alt="Voxel weight ablation and test-time stability analysis"
             />
           </a>
