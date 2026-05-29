@@ -11,105 +11,167 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="site-nav">
-      <nav aria-label="Project navigation">
-        <a href="#introduction">Introduction</a>
-        <a href="#method">Method</a>
-        <a href="#results">Results</a>
-        <a href="#capability">Capability</a>
-        <a href="#analysis">Analysis</a>
-        <a href="#bibtex">BibTeX</a>
-      </nav>
-    </header>
-
     <main>
       <section class="hero">
-        <p class="venue">Project Page</p>
         <h1>Sample-Efficient Post-Training for LEGO Spatial-Physics Reasoning</h1>
-        <p class="authors">Anonymous Authors</p>
+        <p class="authors">
+          Yuhuan Yuan<sup>1,†</sup>, Zhouliang Yu<sup>2,†</sup>, Minghao Liu<sup>3</sup>,
+          Weiyang Liu<sup>2</sup>, Ge Lin Kan<sup>1</sup>
+        </p>
+        <p class="affiliations">
+          <sup>1</sup>HKUST(GZ) &nbsp;&nbsp; <sup>2</sup>CUHK &nbsp;&nbsp; <sup>3</sup>ZODA
+        </p>
+        <p class="notes"><sup>†</sup>Equal contribution</p>
         <div class="button-row" aria-label="Project links">
-          <a class="pill" href="#paper">Paper</a>
-          <a class="pill" href="#code">Code</a>
-          <a class="pill" href="#capability">Figures</a>
-          <a class="pill" href="#bibtex">BibTeX</a>
+          <a class="project-link" href="#paper">Paper</a>
+          <a class="project-link" href="#code">Code</a>
         </div>
-        <p class="hero-summary">
-          LEGO Brick Assembly turns language into executable 3D construction programs. We study how
-          compact high-value data, physics-aware rewards, and test-time regeneration can improve
-          semantic alignment, geometric fidelity, and physical stability.
+
+        <p class="tagline">
+          We study how high-value data selection, physics-aware reinforcement learning, and test-time
+          regeneration improve language-model generation of buildable LEGO brick assemblies.
+        </p>
+
+        <figure class="hero-figure">
+          <object
+            data="assets/pvpo_capability_8cases_2x4.pdf"
+            type="application/pdf"
+            aria-label="PVPO capability examples across eight LEGO generation cases"
+          >
+            <a href="assets/pvpo_capability_8cases_2x4.pdf">Open PVPO capability figure</a>
+          </object>
+          <figcaption>
+            PVPO capability showcase across eight LEGO generation tasks.
+          </figcaption>
+        </figure>
+      </section>
+
+      <nav class="section-nav" aria-label="Section navigation">
+        <a href="#abstract">Abstract</a>
+        <a href="#physhack">PhysHack</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#bibtex">BibTeX</a>
+      </nav>
+
+      <section id="abstract" class="section">
+        <h2>Abstract</h2>
+        <p>
+          Large language models can generate executable LEGO assembly programs from text, but their
+          performance is strongly affected by noisy supervision and shortcut-prone training data. We
+          identify a PhysHack phenomenon: models may achieve high physical validity while failing to
+          preserve object-level semantics. To address this, we propose a sample-efficient post-training
+          framework that combines value-guided data selection with Physics--Voxel Policy Optimization
+          (PVPO).
+        </p>
+        <p>
+          We first select only 5% high-value demonstrations using VLM semantic scores and diversity, then
+          optimize models with a coupled reward combining physical validity and voxel-space geometric
+          alignment. Experiments show that our method improves semantic alignment, geometry fidelity, and
+          stability while using substantially less data than full-scale training.
         </p>
       </section>
 
-      <section id="introduction" class="section">
-        <h2>Introduction</h2>
+      <section id="physhack" class="section">
+        <h2>Problem: PhysHack</h2>
         <p>
-          LEGO Brick Assembly challenges language models to synthesize compositional objects from modular
-          bricks while satisfying precise spatial and physical constraints. Large-scale brick datasets
-          contain more than enough examples, but they can also be noisy, redundant, and misaligned with the
-          target object semantics.
+          LEGO Brick Assembly is a program synthesis task where a policy generates brick commands that
+          must both obey physical constraints and match the object described by the prompt. PhysHack is a
+          failure mode where a model learns to satisfy checkable assembly constraints while drifting away
+          from the intended object semantics and 3D structure.
         </p>
+        <blockquote>
+          A model can be physically valid without being semantically correct.
+        </blockquote>
         <p>
-          This motivates a data-centric question: what makes a training example valuable for LEGO
-          spatial-physics reasoning? We estimate value by measuring semantic consistency between a text
-          description and the rendered LEGO structure, while filtering examples that violate physical
-          constraints.
+          This makes physical validity a hackable proxy: full-scale noisy data can produce structures that
+          are stable or syntactically valid, but generic, overlong, or semantically misaligned. The paper
+          addresses this by combining better data selection with a reward that explicitly couples physics
+          and geometry.
         </p>
-        <div class="rq-grid">
-          <article>
-            <span>Research Question 1</span>
-            <p>
-              Can a compact set of high-value examples enable more effective post-training than full-scale
-              noisy supervision?
-            </p>
-          </article>
-          <article>
-            <span>Research Question 2</span>
-            <p>
-              How should the learning objective exploit verifiable spatial and physical structure during
-              LEGO assembly generation?
-            </p>
-          </article>
-        </div>
       </section>
 
       <section id="method" class="section">
-        <h2>Method</h2>
-        <div class="method-grid">
-          <article>
-            <h3>High-Value Data Selection</h3>
-            <p>
-              We score demonstrations by rendered text-image alignment and physical feasibility, producing
-              compact supervision that emphasizes examples useful for spatial-physics reasoning rather than
-              raw dataset scale.
-            </p>
-          </article>
-          <article>
-            <h3>Physics--Voxel Policy Optimization</h3>
-            <p>
-              PVPO couples physical validity with voxel-space geometric alignment, encouraging generated
-              programs to remain buildable while recovering the intended object shape and layout.
-            </p>
-          </article>
+        <h2>Methods</h2>
+        <h3>Value-Guided Data Selection</h3>
+        <p>
+          Rather than treating all trajectories as equally useful, we estimate the value of a training
+          example by measuring rendered text-structure semantic alignment and filtering physically invalid
+          demonstrations. We then add diversity filtering to keep a compact but broad 5% subset for
+          post-training.
+        </p>
+        <p>
+          This selection strategy is data-efficient: High-Value VLM + Diversity uses only 5% of the data
+          but improves semantic alignment over noisy full-data supervision. Table 1 is shown in full below.
+        </p>
+
+        <div class="table-wrap" role="region" aria-label="Table 1 data selection comparison" tabindex="0">
+          <table>
+            <caption>
+              Table 1: Comparisons of Data Selection. Structure/semantic alignment, physics validity,
+              voxel alignment, and generated-brick statistics for different training strategies.
+            </caption>
+            <thead>
+              <tr>
+                <th rowspan="2">Setting</th>
+                <th colspan="6">Qwen2.5-3B-Instruct</th>
+                <th colspan="6">Llama-3.2-1B-Instruct</th>
+              </tr>
+              <tr>
+                <th>Qwen-VL ↑</th>
+                <th>CLIP ↑</th>
+                <th>DINOv3 ↑</th>
+                <th>Physics ↑</th>
+                <th>Voxel ↑</th>
+                <th>Bricks</th>
+                <th>Qwen-VL ↑</th>
+                <th>CLIP ↑</th>
+                <th>DINOv3 ↑</th>
+                <th>Physics ↑</th>
+                <th>Voxel ↑</th>
+                <th>Bricks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Full dataset</th><td>0.59</td><td>0.26</td><td>0.67</td><td>0.93</td><td>0.32</td><td>196</td><td>0.67</td><td>0.27</td><td>0.74</td><td>0.96</td><td>0.35</td><td>177</td></tr>
+              <tr><th>Diversity-only</th><td>0.58</td><td>0.26</td><td>0.66</td><td>0.95</td><td>0.32</td><td>163</td><td>0.55</td><td>0.25</td><td>0.66</td><td>0.94</td><td>0.31</td><td>199</td></tr>
+              <tr><th>Random subset</th><td>0.56</td><td>0.25</td><td>0.64</td><td>0.91</td><td>0.28</td><td>176</td><td>0.58</td><td>0.25</td><td>0.67</td><td>0.95</td><td>0.32</td><td>194</td></tr>
+              <tr><th>Low-value VLM</th><td>0.51</td><td>0.22</td><td>0.64</td><td>0.85</td><td>0.25</td><td>144</td><td>0.28</td><td>0.22</td><td>0.57</td><td>0.87</td><td>0.29</td><td>334</td></tr>
+              <tr><th>Shortest responses</th><td>0.50</td><td>0.24</td><td>0.65</td><td>0.91</td><td>0.22</td><td>33</td><td>0.49</td><td>0.24</td><td>0.62</td><td>0.89</td><td>0.22</td><td>38</td></tr>
+              <tr><th>Lowest perplexity</th><td>0.45</td><td>0.25</td><td>0.56</td><td>0.88</td><td>0.22</td><td>136</td><td>0.64</td><td>0.27</td><td>0.74</td><td>0.97</td><td>0.30</td><td>140</td></tr>
+              <tr><th>Longest responses</th><td>0.44</td><td>0.23</td><td>0.57</td><td>0.86</td><td>0.26</td><td>346</td><td>0.48</td><td>0.25</td><td>0.62</td><td>0.91</td><td>0.26</td><td>351</td></tr>
+              <tr class="highlight"><th>High-Value VLM</th><td>0.70</td><td>0.27</td><td>0.72</td><td>0.86</td><td>0.30</td><td>162</td><td>0.70</td><td>0.27</td><td>0.72</td><td>0.80</td><td>0.26</td><td>205</td></tr>
+              <tr class="highlight"><th>High-Value VLM + Diversity</th><td>0.72</td><td>0.26</td><td>0.70</td><td>0.86</td><td>0.31</td><td>184</td><td>0.74</td><td>0.27</td><td>0.76</td><td>0.89</td><td>0.32</td><td>181</td></tr>
+              <tr class="highlight strong"><th>PVPO</th><td>0.77</td><td>0.28</td><td>0.80</td><td>0.93</td><td>0.35</td><td>146</td><td>0.67</td><td>0.27</td><td>0.74</td><td>0.97</td><td>0.35</td><td>179</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div class="formula-card">
-          <div>
-            <strong>Physical validity</strong>
-            <code>R_phys(o) = mean(valid bricks)</code>
-          </div>
-          <div>
-            <strong>Voxel alignment</strong>
-            <code>R_vox(o, o*) = 1 - normalized voxel distance</code>
-          </div>
-          <div>
-            <strong>PVPO reward</strong>
-            <code>R_PVPO = (1 - lambda) R_phys + lambda R_vox</code>
-          </div>
+
+        <h3>PVPO: Physics-Voxel Policy Optimization</h3>
+        <p>
+          PVPO jointly optimizes physical validity and voxel-space geometric alignment. The physical
+          reward measures the fraction of valid bricks, while the voxel reward measures shape agreement
+          with the target construction using symmetric voxel-space distance.
+        </p>
+        <div class="formula">
+          <span>R<sub>PVPO</sub>(o, o*) = (1 − λ) R<sub>phys</sub>(o) + λ R<sub>vox</sub>(o, o*)</span>
         </div>
+        <p>
+          In the main experiments, λ = 0.5 provides the best balance between physical feasibility and
+          structural fidelity. The left side of Figure 4 visualizes how the voxel weight changes semantic
+          alignment, physical validity, voxel alignment, and generated-brick count.
+        </p>
         <figure class="paper-figure">
-          <img src="assets/rejection_sampling.png" alt="Rejection sampling and regeneration workflow" />
+          <object
+            data="assets/combined_voxel_stability.pdf"
+            type="application/pdf"
+            aria-label="Voxel weight and stability analysis"
+          >
+            <a href="assets/combined_voxel_stability.pdf">Open voxel and stability analysis figure</a>
+          </object>
           <figcaption>
-            Test-time rejection and regeneration filter invalid structures and retry unstable generations.
-            <a href="assets/rejection_sampling.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+            Figure 4: Voxel-weight ablation and test-time stability analysis from the paper.
           </figcaption>
         </figure>
       </section>
@@ -117,122 +179,88 @@
       <section id="results" class="section">
         <h2>Results</h2>
         <p>
-          PVPO improves semantic alignment and voxel agreement while maintaining strong physical validity.
-          The stability analysis shows that a small regeneration budget can substantially increase
-          Stability@K before returns saturate.
+          The main result is sample-efficient improvement: only 5% high-value data plus PVPO surpasses
+          full-data training on semantic alignment and geometry while preserving physical validity.
         </p>
-        <div class="figure-stack">
-          <figure class="paper-figure">
-            <object
-              data="assets/combined_voxel_stability.pdf"
-              type="application/pdf"
-              aria-label="Combined voxel reward and stability ablation"
-            >
-              <a href="assets/combined_voxel_stability.pdf">Open combined voxel and stability figure</a>
-            </object>
-            <figcaption>
-              Semantic alignment, physics validity, voxel alignment, generated-brick statistics, and
-              Stability@K across regeneration attempts.
-            </figcaption>
-          </figure>
-          <figure class="paper-figure">
-            <img src="assets/stability_mr_1_16.png" alt="Stability versus regeneration budget" />
-            <figcaption>Stability increases quickly as the maximum regeneration budget grows.</figcaption>
-          </figure>
+        <div class="metric-grid">
+          <div class="metric"><span>Qwen-VL@4</span><strong>0.59 → 0.77</strong><small>Full Dataset → PVPO</small></div>
+          <div class="metric"><span>DINOv3@4</span><strong>0.67 → 0.80</strong><small>Full Dataset → PVPO</small></div>
+          <div class="metric"><span>Data Usage</span><strong>100% → 5%</strong><small>Compact high-value supervision</small></div>
+          <div class="metric"><span>Voxel@4</span><strong>0.32 → 0.35</strong><small>Improved geometry alignment</small></div>
         </div>
-      </section>
 
-      <section id="capability" class="section">
-        <h2>Capability Showcase</h2>
+        <h3>Test-Time Scaling</h3>
         <p>
-          The qualitative figures below are taken directly from the paper package and show object-level
-          generation behavior across data-selection and PVPO-style settings.
+          Rejection sampling and regeneration provide a compute-quality knob: Stability@K increases
+          quickly with a small regeneration budget, then saturates after moderate test-time scaling.
         </p>
-        <div class="figure-stack">
-          <figure class="paper-figure tall">
-            <object
-              data="assets/bottle_table_qualitative_2case.pdf"
-              type="application/pdf"
-              aria-label="Bottle and table qualitative comparison"
-            >
-              <a href="assets/bottle_table_qualitative_2case.pdf">Open bottle and table qualitative figure</a>
-            </object>
-            <figcaption>
-              Bottle and table examples comparing ground truth with full-data, PVPO, and high-value settings.
-            </figcaption>
-          </figure>
-          <figure class="paper-figure tall">
-            <object
-              data="assets/pvpo_capability_8cases_2x4.pdf"
-              type="application/pdf"
-              aria-label="Eight-case PVPO capability grid"
-            >
-              <a href="assets/pvpo_capability_8cases_2x4.pdf">Open eight-case PVPO capability grid</a>
-            </object>
-            <figcaption>Eight-case capability grid for generated LEGO structures.</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section id="analysis" class="section">
-        <h2>Analysis</h2>
-        <div class="analysis-grid">
-          <article>
-            <h3>Data-Induced Physics-Reward Hacking</h3>
-            <p>
-              Full-scale noisy supervision can satisfy physical constraints while weakening semantic
-              alignment. High-value data selection separates useful spatial-physics demonstrations from
-              shortcut-prone examples.
-            </p>
-          </article>
-          <article>
-            <h3>Confidence and Selection</h3>
-            <p>
-              Calibration analysis compares best@k selection mechanisms against visual alignment scores,
-              helping diagnose whether model confidence tracks semantic and structural quality.
-            </p>
-          </article>
-          <article>
-            <h3>Compute-Aware Inference</h3>
-            <p>
-              Regeneration improves stability, but the curve saturates. This makes the regeneration budget
-              a practical knob for balancing quality and test-time cost.
-            </p>
-          </article>
-        </div>
         <figure class="paper-figure">
-          <object data="assets/confidence.pdf" type="application/pdf" aria-label="Confidence calibration figure">
-            <a href="assets/confidence.pdf">Open confidence calibration figure</a>
+          <object data="assets/rejection_sampling.pdf" type="application/pdf" aria-label="Test-time rejection sampling figure">
+            <a href="assets/rejection_sampling.pdf">Open rejection sampling figure</a>
           </object>
-          <figcaption>Confidence calibration under different best@k selection mechanisms.</figcaption>
+          <figcaption>Figure 2: Test-time rejection sampling and regeneration.</figcaption>
+        </figure>
+
+        <h3>Calibration</h3>
+        <p>
+          Confidence calibration compares different best@k selection mechanisms against semantic
+          alignment metrics, diagnosing whether confidence tracks structural and visual quality.
+        </p>
+        <figure class="paper-figure">
+          <object data="assets/confidence.pdf" type="application/pdf" aria-label="Calibration heatmap">
+            <a href="assets/confidence.pdf">Open calibration heatmap</a>
+          </object>
+          <figcaption>Figure 5: Calibration heatmap under validity, voxel, and weighted best@k selection.</figcaption>
         </figure>
       </section>
 
-      <section id="paper" class="section compact">
-        <h2>Paper</h2>
+      <section id="gallery" class="section">
+        <h2>Qualitative Gallery</h2>
         <p>
-          This project page accompanies the paper
-          <em>Sample-Efficient Post-Training for LEGO Spatial-Physics Reasoning</em>.
-          Public paper and code links can be added here when available.
+          The qualitative comparison is the most direct view of the method: PVPO and high-value data
+          reduce collisions and improve object-level structure compared with full-data training.
         </p>
-      </section>
-
-      <section id="code" class="section compact">
-        <h2>Code</h2>
-        <p>
-          The website is static and can be served with GitHub Pages. Reproduction code and checkpoints can
-          be linked here after the anonymous release is finalized.
-        </p>
+        <figure class="paper-figure large">
+          <object
+            data="assets/bottle_table_qualitative_2case.pdf"
+            type="application/pdf"
+            aria-label="Bottle and table qualitative comparison"
+          >
+            <a href="assets/bottle_table_qualitative_2case.pdf">Open bottle and table comparison</a>
+          </object>
+          <figcaption>
+            Figure 1: Bottle and table examples. Each case reports Qwen-VL, DINOv3, and CLIP scores.
+          </figcaption>
+        </figure>
+        <figure class="paper-figure large">
+          <object
+            data="assets/pvpo_capability_8cases_2x4.pdf"
+            type="application/pdf"
+            aria-label="PVPO capability grid"
+          >
+            <a href="assets/pvpo_capability_8cases_2x4.pdf">Open PVPO capability grid</a>
+          </object>
+          <figcaption>Figure 6: PVPO capability grid across eight representative LEGO structures.</figcaption>
+        </figure>
       </section>
 
       <section id="bibtex" class="section">
         <h2>BibTeX</h2>
-        <pre class="bibtex"><code>@misc{lego_spatial_physics_reasoning,
+        <pre class="bibtex"><code>@misc{yuan2026lego,
   title = {Sample-Efficient Post-Training for LEGO Spatial-Physics Reasoning},
-  author = {Anonymous},
-  year = {2026},
-  note = {Anonymous preprint}
+  author = {Yuan, Yuhuan and Yu, Zhouliang and Liu, Minghao and Liu, Weiyang and Kan, Ge Lin},
+  year = {2026}
 }</code></pre>
+      </section>
+
+      <section id="paper" class="section compact">
+        <h2>Paper</h2>
+        <p>Paper link will be added when available.</p>
+      </section>
+
+      <section id="code" class="section compact">
+        <h2>Code</h2>
+        <p>Code link will be added when available.</p>
       </section>
     </main>
 
