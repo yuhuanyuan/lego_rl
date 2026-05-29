@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Physics-Aware LEGO Reasoning</title>
+    <meta
+      name="description"
+      content="Project page for physics-aware LEGO brick assembly generation with data valuation and reinforcement learning."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="#top">Physics-Aware LEGO Reasoning</a>
+        <div class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#reproduce">Code</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Language-guided brick assembly</p>
+          <h1>Learning to build physically plausible LEGO structures from text.</h1>
+          <p class="lead">
+            We study how data quality, geometric rewards, and test-time stability checks improve
+            language-model generation of executable LEGO assembly programs.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="#method">Explore Method</a>
+            <a class="button secondary" href="#gallery">View Figures</a>
+          </div>
+        </div>
+        <figure class="hero-figure">
+          <img
+            src="assets/qualitative_comparison_2case.png"
+            alt="Qualitative comparison of ground truth and generated LEGO structures"
+          />
+          <figcaption>Qualitative comparison of generated brick assemblies under different training settings.</figcaption>
+        </figure>
+      </section>
+
+      <section id="overview" class="section overview">
+        <div class="section-kicker">
+          <p class="eyebrow">Overview</p>
+          <h2>Data quality matters for spatial-physics reasoning.</h2>
+        </div>
+        <div class="overview-grid">
+          <article>
+            <h3>Problem</h3>
+            <p>
+              LEGO Brick Assembly asks a model to produce valid construction programs for compositional
+              3D objects. Full-scale datasets can contain noisy, redundant, or semantically mismatched
+              trajectories.
+            </p>
+          </article>
+          <article>
+            <h3>Data valuation</h3>
+            <p>
+              We identify high-value examples by combining rendered visual alignment with physical
+              validity filters, yielding compact supervision that better targets spatial reasoning.
+            </p>
+          </article>
+          <article>
+            <h3>Policy optimization</h3>
+            <p>
+              Physics--Voxel Policy Optimization uses physical validity and voxel-space geometry rewards
+              to improve buildability while preserving object-level structure.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="method" class="section method">
+        <div>
+          <p class="eyebrow">Method</p>
+          <h2>High-value data, reward learning, and stable inference.</h2>
+          <p>
+            The pipeline first constructs a compact high-value subset for supervised fine-tuning. It then
+            uses reinforcement learning with physical and voxel rewards to align generated programs with
+            both assembly constraints and target geometry. At inference time, rejection sampling and
+            regeneration improve the probability of producing stable structures.
+          </p>
+        </div>
+        <ol class="steps">
+          <li>
+            <span>01</span>
+            <strong>Select valuable demonstrations</strong>
+            <p>Filter examples using text-render alignment and physical validity.</p>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>Optimize with PVPO</strong>
+            <p>Reward valid bricks and voxel-space geometric agreement with the reference object.</p>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>Regenerate unstable outputs</strong>
+            <p>Use test-time rejection and regeneration to balance stability and compute cost.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="results" class="section results">
+        <div class="section-kicker">
+          <p class="eyebrow">Results</p>
+          <h2>Better semantic alignment and stronger physical consistency.</h2>
+        </div>
+        <div class="result-grid">
+          <figure class="card wide">
+            <img src="assets/qualitative_comparison_2case.png" alt="Bottle and table qualitative comparison" />
+            <figcaption>
+              Selected qualitative cases show how high-value data and PVPO affect object-level structure.
+            </figcaption>
+          </figure>
+          <figure class="card">
+            <img src="assets/rejection_sampling.png" alt="Rejection sampling workflow and stability" />
+            <figcaption>Rejection sampling filters invalid structures and retries unstable generations.</figcaption>
+          </figure>
+          <figure class="card">
+            <img src="assets/stability_curve.png" alt="Stability increasing with regeneration budget" />
+            <figcaption>Stability improves quickly as the regeneration budget increases.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="gallery" class="section gallery-section">
+        <div class="section-kicker">
+          <p class="eyebrow">Gallery</p>
+          <h2>Capability showcase</h2>
+          <p>
+            The main figures below summarize qualitative performance across object categories and
+            multi-case capability evaluations.
+          </p>
+        </div>
+        <div class="gallery">
+          <figure class="card">
+            <img src="assets/qualitative_comparison_2case.png" alt="Two-case qualitative figure" />
+            <figcaption>Two object-level examples comparing reference structures and generated outputs.</figcaption>
+          </figure>
+          <figure class="card pdf-card">
+            <object
+              data="assets/capability_8cases_2x4.pdf"
+              type="application/pdf"
+              aria-label="Eight-case capability grid"
+            >
+              <a href="assets/capability_8cases_2x4.pdf">Open capability grid PDF</a>
+            </object>
+            <figcaption>
+              Eight-case capability grid.
+              <a href="assets/capability_8cases_2x4.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="reproduce" class="section reproduce">
+        <div>
+          <p class="eyebrow">Code</p>
+          <h2>Reproducible static release</h2>
+          <p>
+            The companion release keeps large datasets, checkpoints, generated outputs, and credentials
+            outside version control. The public website is static and can be served directly with GitHub
+            Pages.
+          </p>
+        </div>
+        <div class="code-card">
+          <pre><code>python3 -m http.server 8000
+# then open http://localhost:8000</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Anonymous project page for physics-aware LEGO assembly generation.</p>
+    </footer>
+  </body>
+</html>
