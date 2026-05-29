@@ -319,8 +319,9 @@ tr.strong {
   overflow-x: auto;
   margin: 26px 0 0;
   padding: 22px;
-  background: #101827;
-  color: #e8eefc;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: #222;
   white-space: pre;
 }
 

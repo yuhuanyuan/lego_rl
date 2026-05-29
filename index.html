@@ -187,16 +187,22 @@
           <div class="metric"><span>Voxel@4</span><strong>0.32 → 0.35</strong><small>Improved geometry alignment</small></div>
         </div>
 
-        <h3>Test-Time Scaling</h3>
+        <h3>Test-Time Scaling on Physics–Structure Alignment.</h3>
         <p>
-          Rejection sampling and regeneration provide a compute-quality knob: Stability@K increases
-          quickly with a small regeneration budget, then saturates after moderate test-time scaling.
+          Increasing the test-time sample budget improves physics--structure alignment by giving the
+          model more opportunities to select generations with stronger visual-semantic and geometric
+          scores under best@k selection.
         </p>
         <figure class="paper-figure">
-          <a class="figure-link" href="assets/rejection_sampling.png" target="_blank" rel="noreferrer">
-            <img src="assets/rejection_sampling.png" alt="Test-time rejection sampling and regeneration workflow" />
+          <a class="figure-link" href="assets/passk_mean_lines_vision_at_k.png" target="_blank" rel="noreferrer">
+            <img
+              src="assets/passk_mean_lines_vision_at_k.png"
+              alt="Test-time scaling curves for physics-structure alignment"
+            />
           </a>
-          <figcaption>Figure 2: Test-time rejection sampling and regeneration.</figcaption>
+          <figcaption>
+            Test-time scaling on physics--structure alignment using VLM and vision-based scores.
+          </figcaption>
         </figure>
 
         <h3>Calibration</h3>
