@@ -25,8 +25,7 @@ body {
   background: var(--bg);
 }
 
-img,
-object {
+img {
   display: block;
   max-width: 100%;
 }
@@ -146,7 +145,10 @@ p {
 }
 
 .hero-figure {
+  overflow: hidden;
   margin-top: 30px;
+  border: 1px solid var(--line);
+  background: white;
 }
 
 .section {
@@ -193,25 +195,26 @@ figure {
   margin: 24px auto 8px;
 }
 
-.paper-figure img,
-.paper-figure object {
+.figure-link {
+  display: block;
+  color: inherit;
+}
+
+.figure-link:hover {
+  color: inherit;
+}
+
+.hero-figure img,
+.paper-figure img {
   width: 100%;
-  min-height: 420px;
   border: 0;
   background: white;
   object-fit: contain;
 }
 
+.hero-figure img,
 .paper-figure img {
   padding: 12px;
-}
-
-.paper-figure object {
-  height: min(78vh, 780px);
-}
-
-.paper-figure.large object {
-  height: min(84vh, 860px);
 }
 
 figcaption {
@@ -345,10 +348,6 @@ tr.strong {
     padding: 30px 18px;
   }
 
-  .paper-figure object,
-  .paper-figure.large object {
-    height: 560px;
-  }
 }
 
 @media (max-width: 560px) {
@@ -362,9 +361,7 @@ tr.strong {
   }
 
   .paper-figure img,
-  .paper-figure object,
-  .paper-figure.large object {
+  .paper-figure.large img {
     min-height: 260px;
-    height: 420px;
   }
 }
